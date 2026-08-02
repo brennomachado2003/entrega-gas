@@ -9,18 +9,16 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class PedidoEntregaResponseDTO {
-    private Integer idPedido;
-    private String nomeCliente;
-    private String telefoneCliente;
-    private String rua;
-    private String numero;
-    private String bairro;
-    private String cidade;
-    private BigDecimal valorCompra;
-    private List<ProdutoItemPedidoDTO> produtos;
-    private LocalDateTime dataPedido;
-}
+
+public record PedidoEntregaResponseDTO (
+    Integer idPedido,
+    String nomeCliente,
+    String telefoneCliente,
+    String rua,
+    String numero,
+    String bairro,
+    String cidade,
+    BigDecimal valorCompra,
+    List<ProdutoItemPedidoDTO> produtos,
+    LocalDateTime dataPedido
+){ }

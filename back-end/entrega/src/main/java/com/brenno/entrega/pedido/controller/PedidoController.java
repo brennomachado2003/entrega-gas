@@ -1,5 +1,6 @@
 package com.brenno.entrega.pedido.controller;
 
+import com.brenno.entrega.pedido.dto.AceitarPedidoRequestDTO;
 import com.brenno.entrega.pedido.dto.PedidoEntregaResponseDTO;
 import com.brenno.entrega.pedido.dto.PedidoRequest;
 import com.brenno.entrega.pedido.dto.PedidoResponseDTO;
@@ -26,10 +27,15 @@ public class PedidoController {
 
     @PostMapping
     public ResponseEntity<PedidoResponseDTO> cadastrar(@RequestBody PedidoRequest pedidoRequest) {
-        Pedido pedido = pedidoService.criarPedido(pedidoRequest);
-        pedidoProdutoService.adicionandoProdutoAoPedido(pedido, pedidoRequest.getProdutos());
-        PedidoResponseDTO response = new PedidoResponseDTO(pedido.getIdPedido(), "Pedido criado com sucesso");
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        try {
+            Pedido pedido = pedidoService.criarPedido(pedidoRequest);
+            pedidoProdutoService.adicionandoProdutoAoPedido(pedido, pedidoRequest.produtos());
+            PedidoResponseDTO response = new PedidoResponseDTO(pedido.getIdPedido(), "Pedido criado com sucesso");
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @GetMapping("/historico")
@@ -40,5 +46,20 @@ public class PedidoController {
         }
         List<PedidoEntregaResponseDTO> pedidoEntregaResponseDTO = pedidos.stream().map(pedidoService::PedidoParaListaPedidoResponseDTO).toList();
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoEntregaResponseDTO);
+    }
+
+    @PatchMapping("/cancelarPedido")
+    public ResponseEntity<PedidoResponseDTO> cancelarPedido(@RequestBody Integer pedidoId) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(pedidoService.cancelarPedido(pedidoId));
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @PatchMapping("/entregadorDefinido")
+    public ResponseEntity<PedidoResponseDTO> entregadoDefinido(@RequestBody AceitarPedidoRequestDTO aceitarPedidoRequestDTO) {
+        return ResponseEntity.status(HttpStatus.OK).body(pedidoService.aceitarPedido(aceitarPedidoRequestDTO.pedidoId(), aceitarPedidoRequestDTO.entregadorId()));
     }
 }

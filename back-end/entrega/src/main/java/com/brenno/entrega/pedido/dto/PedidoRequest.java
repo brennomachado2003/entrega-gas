@@ -7,12 +7,10 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Getter
-@Setter
-public class PedidoRequest {
-    private Integer usuarioId;
-    private Integer empresaId;
-    private Integer enderecoId;
-    private BigDecimal valorCompra;
-    private List<ItemPedidoRequest> produtos;
-}
+public record PedidoRequest (
+        Integer usuarioId,
+        Integer empresaId,
+        Integer enderecoId,
+        BigDecimal valorCompra,
+        List<ItemPedidoRequest> produtos
+){}

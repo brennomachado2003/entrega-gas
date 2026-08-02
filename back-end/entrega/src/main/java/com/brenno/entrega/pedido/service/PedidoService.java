@@ -3,6 +3,8 @@ package com.brenno.entrega.pedido.service;
 import com.brenno.entrega.empresa.model.Empresa;
 import com.brenno.entrega.pedido.dto.PedidoEntregaResponseDTO;
 import com.brenno.entrega.pedido.dto.PedidoRequest;
+import com.brenno.entrega.pedido.dto.PedidoResponseDTO;
+import com.brenno.entrega.pedido.exception.PedidoJaAceitoException;
 import com.brenno.entrega.pedido.itemPedido.dto.ProdutoItemPedidoDTO;
 import com.brenno.entrega.pedido.itemPedido.model.ItemPedido;
 import com.brenno.entrega.pedido.itemPedido.service.ItemPedidoService;
@@ -39,22 +41,6 @@ public class PedidoService {
 
     }
 
-    public PedidoEntregaResponseDTO PedidoParaListaPedidoResponseDTO(Pedido pedido) {
-        PedidoEntregaResponseDTO pedidoEntregaResponseDTO = new PedidoEntregaResponseDTO();
-        pedidoEntregaResponseDTO.setIdPedido(pedido.getIdPedido());
-        pedidoEntregaResponseDTO.setNomeCliente(pedido.getUsuario().getNome());
-        pedidoEntregaResponseDTO.setTelefoneCliente(pedido.getUsuario().getTelefone().getNumero());
-        pedidoEntregaResponseDTO.setRua(pedido.getEndereco().getRua());
-        pedidoEntregaResponseDTO.setNumero(pedido.getEndereco().getNumero());
-        pedidoEntregaResponseDTO.setBairro(pedido.getEndereco().getBairro());
-        pedidoEntregaResponseDTO.setCidade(pedido.getEndereco().getCidade());
-        pedidoEntregaResponseDTO.setDataPedido(pedido.getDataPedido());
-        pedidoEntregaResponseDTO.setValorCompra(pedido.getValorCompra());
-        List<ItemPedido> itens = pedido.getItens();
-        List<ProdutoItemPedidoDTO> produtoItems = itens.stream().map(itemPedidoService::itemParaPedidoEntregaResponseDTO).toList();
-        pedidoEntregaResponseDTO.setProdutos(produtoItems);
-        return pedidoEntregaResponseDTO;
-    }
     public List<Pedido> listaPedidosPorUsuario(Integer usuarioId) {
         return pedidoRepository.findByUsuarioIdUsuarioOrderByDataPedidoDesc(usuarioId);
     }
@@ -70,6 +56,7 @@ public class PedidoService {
     public void delete(Pedido pedido) {
         pedidoRepository.delete(pedido);
     }
+
     public Pedido aberturaPedido(Usuario usuario, Empresa empresa, StatusPedido statusPedido, Endereco endereco) {
         Pedido pedido = new Pedido();
         pedido.setUsuario(usuario);
@@ -79,17 +66,27 @@ public class PedidoService {
         return save(pedido);
     }
     public Pedido criarPedido(PedidoRequest request) {
-        Usuario usuario = usuarioService.findById(request.getUsuarioId());
-        Empresa empresa = empresaService.findById(request.getEmpresaId());
+        Usuario usuario = usuarioService.findById(request.usuarioId());
+        Empresa empresa = empresaService.findById(request.empresaId());
         StatusPedido status = statusPedidoService.findById(2);
-        Endereco endereco = enderecoService.findById(request.getEnderecoId());
-        Pedido pedido = new Pedido();
-        pedido.setUsuario(usuario);
-        pedido.setEmpresa(empresa);
-        pedido.setStatus(status);
-        pedido.setEndereco(endereco);
-        pedido.setValorCompra(request.getValorCompra());
+        Endereco endereco = enderecoService.findById(request.enderecoId());
+        Pedido pedido = new Pedido(usuario, empresa, status, endereco, request.valorCompra());
         return pedidoRepository.save(pedido);
+    }
+    public PedidoResponseDTO cancelarPedido(Integer pedidoId) {
+        Pedido pedido = findById(pedidoId);
+        StatusPedido statusPedido = statusPedidoService.findById(6);
+        pedido.setStatus(statusPedido);
+        save(pedido);
+        return PedidoParaListaPedidoResponse(save(pedido), "Pedido cancelado");
+    }
+    public PedidoResponseDTO PedidoParaListaPedidoResponse(Pedido pedido, String mensagem) {
+        return new PedidoResponseDTO(pedido.getIdPedido(), mensagem);
+    }
+    public PedidoEntregaResponseDTO PedidoParaListaPedidoResponseDTO(Pedido pedido) {
+        List<ItemPedido> itens = pedido.getItens();
+        List<ProdutoItemPedidoDTO> produtoItems = itens.stream().map(itemPedidoService::itemParaPedidoEntregaResponseDTO).toList();
+        return PedidoParaPedidoEntregaResponseDTO(pedido, produtoItems);
     }
     public PedidoEntregaResponseDTO PedidoParaPedidoEntregaResponseDTO(Pedido pedido, List<ProdutoItemPedidoDTO> produtos) {
         return new PedidoEntregaResponseDTO(
@@ -107,15 +104,12 @@ public class PedidoService {
 
     }
     @Transactional
-    public Pedido aceitarPedido(Integer pedidoId, Integer entregadorId) {
-
+    public PedidoResponseDTO aceitarPedido(Integer pedidoId, Integer entregadorId) {
         int updated = pedidoRepository.aceitarPedido(pedidoId, entregadorId);
-
         if (updated == 0) {
-            throw new RuntimeException("Pedido já foi aceito por outro entregador");
+            throw new PedidoJaAceitoException();
         }
-
-        return pedidoRepository.findById(pedidoId)
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+        return PedidoParaListaPedidoResponse(pedido, "Entregador aceito");
     }
 }

@@ -59,4 +59,12 @@ public class Pedido {
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<ItemPedido> itens;
+
+    public Pedido(Usuario usuario, Empresa empresa, StatusPedido status, Endereco endereco, BigDecimal valorCompra) {
+        this.usuario = usuario;
+        this.empresa = empresa;
+        this.status = status;
+        this.endereco = endereco;
+        this.valorCompra = valorCompra;
+    }
 }
