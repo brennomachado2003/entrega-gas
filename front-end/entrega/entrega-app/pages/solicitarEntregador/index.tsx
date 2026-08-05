@@ -13,11 +13,12 @@ import {
 
 import { styles } from "./style";
 import { useSolicitarEntregador } from "../../hooks/notificacao/useSolicitarEntregador";
+import { useCancelarPedido } from "../../hooks/pedido/useCancelarPedido";
+
 
 export default function SolicitarEntregador() {
   const route = useRoute();
   const navigation = useNavigation();
-
   const { pedidoId } = route.params as {
     pedidoId: number;
   };
@@ -28,6 +29,11 @@ export default function SolicitarEntregador() {
     error,
   } = useSolicitarEntregador();
 
+    const {
+    cancelar,
+    loading: loadingCancelamento,
+  } = useCancelarPedido();
+
   useEffect(() => {
     async function iniciarBusca() {
       await solicitar(pedidoId);
@@ -36,7 +42,11 @@ export default function SolicitarEntregador() {
     iniciarBusca();
   }, [pedidoId]);
 
-  function cancelarPedido() {
+    async function cancelarPedido() {
+    const pedido = await cancelar(pedidoId);
+    if (!pedido) {
+      return;
+    }
     navigation.goBack();
   }
 
@@ -96,9 +106,12 @@ export default function SolicitarEntregador() {
       <Pressable
         style={styles.cancelButton}
         onPress={cancelarPedido}
+        disabled={loadingCancelamento}
       >
         <Text style={styles.cancelButtonText}>
-          CANCELAR PEDIDO
+          {loadingCancelamento
+            ? "CANCELANDO..."
+            : "CANCELAR PEDIDO"}
         </Text>
       </Pressable>
     </ScrollView>

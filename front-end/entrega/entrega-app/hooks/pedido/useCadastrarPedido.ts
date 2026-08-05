@@ -19,29 +19,28 @@ export function useCadastrarPedido() {
     pedido: Omit<PedidoRequest, "usuarioId">
   ) {
     setLoading(true);
-
     try {
       const usuarioStorage = await AsyncStorage.getItem("@entrega:user");
-
       if (!usuarioStorage) {
         Alert.alert("Erro", "Usuário não encontrado.");
         return false;
       }
-
       const usuario: UsuarioStorage = JSON.parse(usuarioStorage);
 
-      await cadastrarPedido({
+      const pedidoCriado = await cadastrarPedido({
         ...pedido,
         usuarioId: usuario.id,
       });
 
       Alert.alert("Sucesso", "Pedido criado com sucesso!");
-      return true;
-    } catch (error) {
+      return pedidoCriado;
+    } 
+    catch (error) {
       console.log("erro cadastrar pedido", error);
       Alert.alert("Erro", "Erro ao criar pedido.");
-      return false;
-    } finally {
+      return null;
+    } 
+    finally {
       setLoading(false);
     }
   }

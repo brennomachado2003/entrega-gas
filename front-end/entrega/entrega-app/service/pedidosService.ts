@@ -1,4 +1,4 @@
-import { get, post } from "./http";
+import { get, patch, post } from "./http";
 import {HistoricoRequestDTO,PedidoEntregaResponseDTO} from "../components/listaPedidos/types";
 import {PedidoRequest, PedidoResponseDTO} from "../pages/pedido/types";
 
@@ -8,4 +8,8 @@ export function listaPedidos(request: HistoricoRequestDTO): Promise<PedidoEntreg
 
 export function cadastrarPedido( pedido: PedidoRequest): Promise<PedidoResponseDTO> {
   return post("/pedido", pedido);
+}
+
+export function cancelarPedido(pedidoId: number): Promise<PedidoResponseDTO> {
+  return patch("/pedido/cancelarPedido", pedidoId);
 }

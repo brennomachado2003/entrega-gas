@@ -12,16 +12,20 @@ import { EnderecoResponseDTO } from "../../components/endereco/types";
 import { useCarrinho } from "../../hooks/carrinho/useCarrinho";
 import { useBuscarEndereco } from "../../hooks/endereco/useBuscarEndereco";
 import { useCadastrarPedido } from "../../hooks/pedido/useCadastrarPedido";
+import { useNavigation } from "@react-navigation/native";
 import { styles } from "./style";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../navigation/stack/StackNavigation";
 
 export default function Pedido() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, "Pedido">>();
   const [enderecoSelecionado, setEnderecoSelecionado] =
     useState<EnderecoResponseDTO | null>(null);
 
   const { enderecos, buscar } = useBuscarEndereco();
 
   const {
-    cadastrar: cadastrarPedido,
+    cadastrar: cadastrar,
     loading: loadingPedido,
   } = useCadastrarPedido();
 
@@ -44,21 +48,27 @@ export default function Pedido() {
       return;
     }
 
-    const sucesso = await cadastrarPedido({
-  empresaId: 1,
-  enderecoId: enderecoSelecionado.idEndereco,
-  valorCompra: total,
-  produtos: carrinho.map((item) => ({
-    produtoId: item.produto.idProduto,
-    quantidade: item.quantidade,
-    desconto: 0,
-  })),
-});
+    const pedido = await cadastrar({
+      empresaId: 1,
+      enderecoId: enderecoSelecionado.idEndereco,
+      valorCompra: total,
+      produtos: carrinho.map((item) => ({
+        produtoId: item.produto.idProduto,
+        quantidade: item.quantidade,
+        desconto: 0,
+      })),
+    });
 
-    if (sucesso) {
-      limparCarrinho();
-      setEnderecoSelecionado(null);
+    if (!pedido) {
+      return null;
     }
+
+    limparCarrinho();
+    setEnderecoSelecionado(null);
+
+    navigation.navigate("SolicitarEntregador", {
+      pedidoId: pedido.pedidoId,
+    });
   }
 
   return (

@@ -116,4 +116,14 @@ retryButtonText: {
 
   fontWeight: "700",
 },
+
+status: {
+  alignSelf: "flex-start",
+  fontSize: 13,
+  fontWeight: "700",
+  paddingHorizontal: 12,
+  paddingVertical: 6,
+  borderRadius: 8,
+  marginBottom: 8,
+},
 });

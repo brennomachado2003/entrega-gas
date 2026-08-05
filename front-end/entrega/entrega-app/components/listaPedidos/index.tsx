@@ -11,6 +11,46 @@ import { styles } from "./style";
 import { useListaPedidos } from "../../hooks/pedido/useListaPedidos";
 import { useCarrinho } from "../../hooks/carrinho/useCarrinho";
 
+function getStatusStyle(idStatus: number) {
+  switch (idStatus) {
+    case 1: // Rascunho
+      return {
+        backgroundColor: "#9CA3AF",
+        color: "#FFFFFF",
+      };
+
+    case 2: // Disponível
+      return {
+        backgroundColor: "#3B82F6",
+        color: "#FFFFFF",
+      };
+
+    case 3: // Aceito
+      return {
+        backgroundColor: "#F59E0B",
+        color: "#FFFFFF",
+      };
+
+    case 4: // Finalizado
+      return {
+        backgroundColor: "#22C55E",
+        color: "#FFFFFF",
+      };
+
+    case 5: // Cancelado
+      return {
+        backgroundColor: "#EF4444",
+        color: "#FFFFFF",
+      };
+
+    default:
+      return {
+        backgroundColor: "#64748B",
+        color: "#FFFFFF",
+      };
+  }
+}
+
 export default function ListaPedidos() {
   const {
     pedidos,
@@ -67,12 +107,15 @@ export default function ListaPedidos() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.list}
       >
-        {pedidos.map((pedido) => (
-          <View
-            key={pedido.idPedido}
-            style={styles.card}
-          >
-            <View style={styles.header}>
+        {pedidos.map((pedido) => {
+          const statusStyle = getStatusStyle(pedido.status.idStatus);
+
+          return (
+            <View
+              key={pedido.idPedido}
+              style={styles.card}
+            >
+              <View style={styles.header}>
               <Text style={styles.pedido}>
                 Pedido #{pedido.idPedido}
               </Text>
@@ -102,12 +145,27 @@ export default function ListaPedidos() {
                 ).toLocaleDateString("pt-BR")}
               </Text>
 
-              <Text style={styles.price}>
-                R$ {pedido.valorCompra.toFixed(2)}
-              </Text>
+              <View>
+                 <Text
+                  style={[
+                    styles.status,
+                    {
+                      backgroundColor: statusStyle.backgroundColor,
+                      color: statusStyle.color,
+                    },
+                  ]}
+                >
+                  {pedido.status.tipoStatus}
+                </Text>
+                <Text style={styles.price}>
+                  R$ {pedido.valorCompra.toFixed(2)}
+                </Text>
+              </View>
+
+              
             </View>
           </View>
-        ))}
+        )})}
       </ScrollView>
     </View>
   );

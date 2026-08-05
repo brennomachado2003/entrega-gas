@@ -1,6 +1,7 @@
 package com.brenno.entrega.pedido.dto;
 
 import com.brenno.entrega.pedido.itemPedido.dto.ProdutoItemPedidoDTO;
+import com.brenno.entrega.pedido.statusPedido.model.StatusPedido;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,5 +21,6 @@ public record PedidoEntregaResponseDTO (
     String cidade,
     BigDecimal valorCompra,
     List<ProdutoItemPedidoDTO> produtos,
-    LocalDateTime dataPedido
+    LocalDateTime dataPedido,
+    StatusPedido status
 ){ }

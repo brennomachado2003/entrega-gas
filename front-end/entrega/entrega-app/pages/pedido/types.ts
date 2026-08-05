@@ -13,6 +13,6 @@ export type PedidoRequest = {
 };
 
 export type PedidoResponseDTO = {
-  idPedido: number;
+  pedidoId: number;
   mensagem: string;
 };

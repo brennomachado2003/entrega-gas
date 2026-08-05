@@ -9,6 +9,11 @@ export interface ProdutoItemPedidoDTO {
     valorUnitario: number;
 }
 
+export interface StatusPedidoDTO {
+    idStatus: number;
+    tipoStatus: string;
+}
+
 export interface PedidoEntregaResponseDTO {
     idPedido: number;
     nomeCliente: string;
@@ -20,4 +25,5 @@ export interface PedidoEntregaResponseDTO {
     valorCompra: number;
     produtos: ProdutoItemPedidoDTO[];
     dataPedido: string;
+    status: StatusPedidoDTO;
 }

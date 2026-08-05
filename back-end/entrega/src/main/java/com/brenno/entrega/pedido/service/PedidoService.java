@@ -75,7 +75,7 @@ public class PedidoService {
     }
     public PedidoResponseDTO cancelarPedido(Integer pedidoId) {
         Pedido pedido = findById(pedidoId);
-        StatusPedido statusPedido = statusPedidoService.findById(6);
+        StatusPedido statusPedido = statusPedidoService.findById(5);
         pedido.setStatus(statusPedido);
         save(pedido);
         return PedidoParaListaPedidoResponse(save(pedido), "Pedido cancelado");
@@ -99,7 +99,8 @@ public class PedidoService {
                 pedido.getEndereco().getCidade(),
                 pedido.getValorCompra(),
                 produtos,
-                pedido.getDataPedido()
+                pedido.getDataPedido(),
+                pedido.getStatus()
         );
 
     }
