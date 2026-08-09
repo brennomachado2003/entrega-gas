@@ -31,5 +31,6 @@ public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
     """)
     int aceitarPedido(Integer pedidoId, Integer entregadorId);
     List<Pedido> findByUsuarioIdUsuarioOrderByDataPedidoDesc(Integer usuarioId);
+    List<Pedido> findByEntregadorIdEntregadorOrderByDataPedidoDesc(Integer entregadorId);
 
 }

@@ -19,3 +19,10 @@ export type EnderecoResponseDTO = {
   cidade: string;
   estado: string;
 };
+
+export type EnderecoProps = {
+  enderecos: EnderecoResponseDTO[];
+  enderecoSelecionado?: EnderecoResponseDTO | null;
+  onSelecionarEndereco: (endereco: EnderecoResponseDTO) => void;
+  onEnderecoCadastrado?: () => void;
+};

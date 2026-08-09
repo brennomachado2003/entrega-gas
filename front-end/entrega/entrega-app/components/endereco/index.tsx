@@ -1,16 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, Pressable, TextInput } from "react-native";
 
-import { EnderecoResponseDTO, EnderecoCadastroDTO } from "./types";
+import { EnderecoResponseDTO, EnderecoCadastroDTO, EnderecoProps } from "./types";
 import { styles } from "./style";
 import { useCadastrarEndereco } from "../../hooks/endereco/useCadastrarEndereco";
-
-type EnderecoProps = {
-  enderecos: EnderecoResponseDTO[];
-  enderecoSelecionado?: EnderecoResponseDTO | null;
-  onSelecionarEndereco: (endereco: EnderecoResponseDTO) => void;
-  onEnderecoCadastrado?: () => void;
-};
+import { useBuscarCep } from "../../hooks/cepApi/useBuscarCep";
 
 const formInicial: EnderecoCadastroDTO = {
   usuarioId: 0,
@@ -29,18 +23,31 @@ export default function Endereco({
   onSelecionarEndereco,
   onEnderecoCadastrado,
 }: EnderecoProps) {
+
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [form, setForm] = useState<EnderecoCadastroDTO>(formInicial);
-
+  const { buscarCep, buscandoCep } = useBuscarCep();
   const { cadastrar, loading, errors } = useCadastrarEndereco();
 
-  function alterarCampo(campo: keyof EnderecoCadastroDTO, valor: string) {
-    setForm((prev) => ({
-      ...prev,
-      [campo]: valor,
-    }));
+    function alterarCampo(campo: keyof EnderecoCadastroDTO, valor: string) {
+      setForm((prev) => ({
+        ...prev,
+        [campo]: valor,
+      }));
+    }
+    async function alterarCep(valor: string) {
+      alterarCampo("cep", valor);
+      const resultado = await buscarCep(valor);
+      if (!resultado || resultado.erro) return;
+      setForm((prev) => ({
+        ...prev,
+        cep: valor,
+        rua: resultado.logradouro,
+        bairro: resultado.bairro,
+        cidade: resultado.localidade,
+        estado: resultado.uf,
+      }));
   }
-
   async function salvarEndereco() {
     const sucesso = await cadastrar(form);
 
@@ -66,6 +73,17 @@ export default function Endereco({
 
       {mostrarFormulario && (
         <View style={styles.form}>
+          <TextInput
+            style={[styles.input, errors.cep && styles.inputError]}
+            placeholder="CEP"
+            value={form.cep}
+            keyboardType="numeric"
+            returnKeyType="next"
+            onChangeText={(valor) => alterarCampo("cep", valor)}
+            onBlur={() => alterarCep(form.cep)}
+            onSubmitEditing={() => alterarCep(form.cep)}
+          />
+          
           <TextInput
             style={[styles.input, errors.rua && styles.inputError]}
             placeholder="Rua"
@@ -106,14 +124,6 @@ export default function Endereco({
             placeholder="Estado"
             value={form.estado}
             onChangeText={(valor) => alterarCampo("estado", valor)}
-          />
-
-          <TextInput
-            style={[styles.input, errors.cep && styles.inputError]}
-            placeholder="CEP"
-            value={form.cep}
-            keyboardType="numeric"
-            onChangeText={(valor) => alterarCampo("cep", valor)}
           />
 
           <Pressable

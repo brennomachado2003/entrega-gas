@@ -11,7 +11,7 @@ import {
 import { styles } from "./style";
 
 import {
-  ListPedidos,
+  ListPedidosEntrega,
   Saudacao,
   NotificacarEntrega,
 } from "../../../components";
@@ -276,7 +276,7 @@ export default function HomeEntregador() {
           Próximas Entregas / Histórico
         </Text>
 
-        <ListPedidos />
+        <ListPedidosEntrega />
       </ScrollView>
     </>
   );

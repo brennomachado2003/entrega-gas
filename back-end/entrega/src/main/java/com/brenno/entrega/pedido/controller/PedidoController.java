@@ -40,12 +40,16 @@ public class PedidoController {
 
     @GetMapping("/historico")
     public ResponseEntity<List<PedidoEntregaResponseDTO>> listaHistorico(Integer usuarioId) {
-        List<Pedido> pedidos = pedidoService.listaPedidosPorUsuario(usuarioId);
-        if (pedidos == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        List<PedidoEntregaResponseDTO> pedidoEntregaResponseDTO = pedidos.stream().map(pedidoService::PedidoParaListaPedidoResponseDTO).toList();
-        return ResponseEntity.status(HttpStatus.CREATED).body(pedidoEntregaResponseDTO);
+        List<PedidoEntregaResponseDTO> pedidos = pedidoService.listaPedidosPorUsuario(usuarioId);
+        if (pedidos == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.CREATED).body(pedidos);
+    }
+
+    @GetMapping("/historico/entrega")
+    public ResponseEntity<List<PedidoEntregaResponseDTO>> listaEntrega(Integer entregadorId) {
+        List<PedidoEntregaResponseDTO> pedidos = pedidoService.listaPedidosPorEntregador(entregadorId);
+        if (pedidos == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.CREATED).body(pedidos);
     }
 
     @PatchMapping("/cancelarPedido")

@@ -40,9 +40,13 @@ public class PedidoService {
         this.itemPedidoService = itemPedidoService;
 
     }
-
-    public List<Pedido> listaPedidosPorUsuario(Integer usuarioId) {
-        return pedidoRepository.findByUsuarioIdUsuarioOrderByDataPedidoDesc(usuarioId);
+    public List<PedidoEntregaResponseDTO> listaPedidosPorUsuario(Integer usuarioId) {
+        List<Pedido> pedidos = pedidoRepository.findByUsuarioIdUsuarioOrderByDataPedidoDesc(usuarioId);
+        return pedidos.stream().map(this::PedidoParaListaPedidoResponseDTO).toList();
+    }
+    public List<PedidoEntregaResponseDTO> listaPedidosPorEntregador(Integer entregadorId) {
+        List<Pedido> pedidos = pedidoRepository.findByEntregadorIdEntregadorOrderByDataPedidoDesc(entregadorId);
+        return pedidos.stream().map(this::PedidoParaListaPedidoResponseDTO).toList();
     }
     public Pedido save(Pedido pedido) {
         return pedidoRepository.save(pedido);
@@ -56,7 +60,6 @@ public class PedidoService {
     public void delete(Pedido pedido) {
         pedidoRepository.delete(pedido);
     }
-
     public Pedido aberturaPedido(Usuario usuario, Empresa empresa, StatusPedido statusPedido, Endereco endereco) {
         Pedido pedido = new Pedido();
         pedido.setUsuario(usuario);
@@ -102,7 +105,6 @@ public class PedidoService {
                 pedido.getDataPedido(),
                 pedido.getStatus()
         );
-
     }
     @Transactional
     public PedidoResponseDTO aceitarPedido(Integer pedidoId, Integer entregadorId) {
