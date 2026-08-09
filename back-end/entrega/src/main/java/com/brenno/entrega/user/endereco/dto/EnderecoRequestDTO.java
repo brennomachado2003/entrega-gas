@@ -18,11 +18,12 @@ public class EnderecoRequestDTO {
     @Override
     public String toString() {
         return String.format(
-                "%s, %s, %s, %s, %s",
+                "%s, %s, %s, %s, %s, %s, Brasil",
                 rua,
                 numero,
                 bairro,
                 cidade,
+                estado,
                 cep
         );
     }
