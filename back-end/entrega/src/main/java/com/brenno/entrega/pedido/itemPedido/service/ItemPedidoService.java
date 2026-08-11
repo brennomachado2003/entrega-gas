@@ -4,8 +4,8 @@ import com.brenno.entrega.pedido.itemPedido.dto.ItemPedidoRequest;
 import com.brenno.entrega.pedido.itemPedido.dto.ProdutoItemPedidoDTO;
 import com.brenno.entrega.pedido.model.Pedido;
 import com.brenno.entrega.pedido.itemPedido.model.ItemPedido;
-import com.brenno.entrega.produto.model.Produto;
-import com.brenno.entrega.produto.service.ProdutoService;
+import com.brenno.entrega.produto.api.ProdutoApi;
+import com.brenno.entrega.produto.dto.ProdutoResponseDTO;
 import com.brenno.entrega.pedido.itemPedido.repository.ItemPedidoRepository;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +15,11 @@ import java.util.Optional;
 @Service
 public class ItemPedidoService {
     private final ItemPedidoRepository pedidoProdutoRepository;
-    private final ProdutoService produtoService;
+    private final ProdutoApi produtoApi;
 
-    public ItemPedidoService(ItemPedidoRepository pedidoProdutoRepository, ProdutoService produtoService) {
+    public ItemPedidoService(ItemPedidoRepository pedidoProdutoRepository, ProdutoApi produtoApi) {
         this.pedidoProdutoRepository = pedidoProdutoRepository;
-        this.produtoService = produtoService;
+        this.produtoApi = produtoApi;
     }
 
     public ItemPedido save(ItemPedido pedidoProduto) {
@@ -40,22 +40,16 @@ public class ItemPedidoService {
 
     public void adicionandoProdutoAoPedido(Pedido pedido, List<ItemPedidoRequest> produtos) {
         produtos.forEach(item -> {
-            Produto produto = produtoService.findById(item.getProdutoId());
-
-            ItemPedido pedidoProduto = new ItemPedido();
-            pedidoProduto.setPedido(pedido);
-            pedidoProduto.setProduto(produto);
-            pedidoProduto.setQuantidade(item.getQuantidade());
-            pedidoProduto.setValorUnitario(produto.getValor());
-            pedidoProduto.setDesconto(item.getDesconto());
-
-            save(pedidoProduto);
+            ProdutoResponseDTO produto = produtoApi.buscar(item.getProdutoId());
+            save(new ItemPedido(pedido, item.getProdutoId(), item.getQuantidade(), produto.getValor(), item.getDesconto()));
         });
     }
 
     public ProdutoItemPedidoDTO itemParaPedidoEntregaResponseDTO(ItemPedido item){
+        ProdutoResponseDTO produto = produtoApi.buscar(item.getIdProduto());
+
         return new ProdutoItemPedidoDTO(
-                    item.getProduto().getNome(),
+                    produto.getNome(),
                     item.getQuantidade(),
                     item.getValorUnitario(),
                     item.getDesconto()

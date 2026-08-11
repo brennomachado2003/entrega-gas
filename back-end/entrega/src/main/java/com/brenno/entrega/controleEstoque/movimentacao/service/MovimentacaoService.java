@@ -81,11 +81,11 @@ public class MovimentacaoService {
         Pedido pedido = pedidoService.findById(movimentacaoVendaRequestDTO.getIdPedido());
         List<ItemPedido> itens = pedido.getItens();
         itens.forEach(item -> {
-            if(item.getProduto().getIdProduto() == 1){
+            if(item.getIdProduto() == 1){
                 movimentacaoVendaRequestDTO.setQuantidadeBotijaoCheio(movimentacaoVendaRequestDTO.getQuantidadeBotijaoCheio() - item.getQuantidade());
                 movimentacaoVendaRequestDTO.setQuantidadeBotijaoVazio(movimentacaoVendaRequestDTO.getQuantidadeBotijaoVazio() + item.getQuantidade());
             }
-            else if(item.getProduto().getIdProduto() == 2){
+            else if(item.getIdProduto() == 2){
                 movimentacaoVendaRequestDTO.setQuantidadeBotijaoCheio(movimentacaoVendaRequestDTO.getQuantidadeBotijaoCheio() - item.getQuantidade());
                 movimentacaoVendaRequestDTO.setQuantidadeBotijaoCompleto(movimentacaoVendaRequestDTO.getQuantidadeBotijaoCompleto() + item.getQuantidade());
             }

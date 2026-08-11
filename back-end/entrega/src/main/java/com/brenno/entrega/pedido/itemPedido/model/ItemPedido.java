@@ -1,7 +1,6 @@
 package com.brenno.entrega.pedido.itemPedido.model;
 
 import com.brenno.entrega.pedido.model.Pedido;
-import com.brenno.entrega.produto.model.Produto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,9 +28,8 @@ public class ItemPedido {
     @ToString.Exclude
     private Pedido pedido;
 
-    @ManyToOne
-    @JoinColumn(name = "id_produto", nullable = false)
-    private Produto produto;
+    @Column(name = "id_produto", nullable = false)
+    private Integer idProduto;
 
     @Column(name = "quantidade", nullable = false)
     private Integer quantidade;
@@ -41,4 +39,12 @@ public class ItemPedido {
 
     @Column(name = "desconto", nullable = false, precision = 10, scale = 2)
     private BigDecimal desconto;
+
+    public ItemPedido(Pedido pedido, Integer idProduto,  Integer quantidade, BigDecimal valorUnitario, BigDecimal desconto) {
+        this.pedido = pedido;
+        this.idProduto = idProduto;
+        this.quantidade = quantidade;
+        this.valorUnitario = valorUnitario;
+        this.desconto = desconto;
+    }
 }
