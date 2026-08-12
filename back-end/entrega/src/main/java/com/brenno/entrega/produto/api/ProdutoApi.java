@@ -2,50 +2,23 @@ package com.brenno.entrega.produto.api;
 
 import com.brenno.entrega.produto.dto.ProdutoRequestDTO;
 import com.brenno.entrega.produto.dto.ProdutoResponseDTO;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Component
-public class ProdutoApi {
+@FeignClient(name = "produtos")
+public interface ProdutoApi {
 
-    private final RestClient restClient;
+    @PostMapping("/produtos")
+    ProdutoResponseDTO cadastrar(@RequestBody ProdutoRequestDTO dto);
 
-    private ProdutoApi() {
-        this.restClient = RestClient.builder()
-                .baseUrl("http://localhost:8082")
-                .build();
-    }
+    @GetMapping("/produtos")
+    List<ProdutoResponseDTO> listar();
 
-    public ProdutoResponseDTO cadastrar(ProdutoRequestDTO dto) {
-        return restClient.post()
-                .uri("/produtos")
-                .body(dto)
-                .retrieve()
-                .body(ProdutoResponseDTO.class);
-    }
+    @GetMapping("/produtos/{id}")
+    ProdutoResponseDTO buscar(@PathVariable Integer id);
 
-    public List<ProdutoResponseDTO> listar() {
-        return restClient.get()
-                .uri("/produtos")
-                .retrieve()
-                .body(new ParameterizedTypeReference<List<ProdutoResponseDTO>>() {});
-    }
-
-    public ProdutoResponseDTO buscar(Integer id) {
-        return restClient.get()
-                .uri("/produtos/{id}", id)
-                .retrieve()
-                .body(ProdutoResponseDTO.class);
-    }
-
-    public ProdutoResponseDTO atualizar(Integer id, ProdutoRequestDTO dto) {
-        return restClient.put()
-                .uri("/produtos/{id}", id)
-                .body(dto)
-                .retrieve()
-                .body(ProdutoResponseDTO.class);
-    }
+    @PutMapping("/produtos/{id}")
+    ProdutoResponseDTO atualizar(@PathVariable Integer id, @RequestBody ProdutoRequestDTO dto);
 }

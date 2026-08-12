@@ -1,9 +1,9 @@
-package com.brenno.entrega.produto.service;
+package com.produtos.produtos.service;
 
-import com.brenno.entrega.produto.dto.ProdutoRequestDTO;
-import com.brenno.entrega.produto.dto.ProdutoResponseDTO;
-import com.brenno.entrega.produto.model.Produto;
-import com.brenno.entrega.produto.repository.ProdutoRepository;
+import com.produtos.produtos.dto.ProdutoRequestDTO;
+import com.produtos.produtos.dto.ProdutoResponseDTO;
+import com.produtos.produtos.model.Produto;
+import com.produtos.produtos.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

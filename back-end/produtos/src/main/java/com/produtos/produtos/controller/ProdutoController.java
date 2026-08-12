@@ -1,9 +1,10 @@
-package com.brenno.entrega.produto.controller;
+package com.produtos.produtos.controller;
 
-import com.brenno.entrega.produto.dto.ProdutoRequestDTO;
-import com.brenno.entrega.produto.dto.ProdutoResponseDTO;
-import com.brenno.entrega.produto.model.Produto;
-import com.brenno.entrega.produto.service.ProdutoService;
+
+import com.produtos.produtos.dto.ProdutoRequestDTO;
+import com.produtos.produtos.dto.ProdutoResponseDTO;
+import com.produtos.produtos.model.Produto;
+import com.produtos.produtos.service.ProdutoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +45,5 @@ public class ProdutoController {
         ProdutoResponseDTO response = produtoService.update(id, dto);
         return ResponseEntity.ok(response);
     }
-
 
 }

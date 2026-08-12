@@ -1,6 +1,6 @@
-package com.brenno.entrega.produto.repository;
+package com.produtos.produtos.repository;
 
-import com.brenno.entrega.produto.model.Produto;
+import com.produtos.produtos.model.Produto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,4 @@
-package com.brenno.entrega.produto.dto;
+package com.produtos.produtos.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
