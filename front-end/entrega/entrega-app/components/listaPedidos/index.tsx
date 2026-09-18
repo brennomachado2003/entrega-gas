@@ -10,6 +10,9 @@ import {
 import { styles } from "./style";
 import { useListaPedidos } from "../../hooks/pedido/useListaPedidos";
 import { useCarrinho } from "../../hooks/carrinho/useCarrinho";
+import ProdutoPedido from "../../components/produtoPedido";
+import { useBuscarEndereco } from "../../hooks/endereco/useBuscarEndereco";
+import EnderecoPedido from "../enderecoPedido";
 
 function getStatusStyle(idStatus: number) {
   switch (idStatus) {
@@ -107,65 +110,27 @@ export default function ListaPedidos() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.list}
       >
-        {pedidos.map((pedido) => {
-          const statusStyle = getStatusStyle(pedido.status.idStatus);
+        {pedidos.map((pedido) => (
+          <View key={pedido.idPedido} style={styles.card}>
 
-          return (
-            <View
-              key={pedido.idPedido}
-              style={styles.card}
-            >
-              <View style={styles.header}>
-              <Text style={styles.pedido}>
-                Pedido #{pedido.idPedido}
-              </Text>
-            </View>
-
-            <Text style={styles.address}>
-              {pedido.rua}, {pedido.numero}
+            <Text style={styles.pedido}>
+              Pedido #{pedido.idPedido}
             </Text>
 
-            <Text style={styles.address}>
-              {pedido.bairro} - {pedido.cidade}
-            </Text>
+            <EnderecoPedido
+              idEndereco={pedido.idEndereco}
+            />
 
-            {pedido.produtos.map((produto, index) => (
-              <Text
-                key={index}
-                style={styles.product}
-              >
-                🛢️ {produto.nomeProduto}
-              </Text>
+            {pedido.produtos.map((produto) => (
+              <ProdutoPedido
+                key={produto.produtoId}
+                produtoId={produto.produtoId}
+                quantidade={produto.quantidade}
+              />
             ))}
 
-            <View style={styles.footer}>
-              <Text style={styles.date}>
-                {new Date(
-                  pedido.dataPedido
-                ).toLocaleDateString("pt-BR")}
-              </Text>
-
-              <View>
-                 <Text
-                  style={[
-                    styles.status,
-                    {
-                      backgroundColor: statusStyle.backgroundColor,
-                      color: statusStyle.color,
-                    },
-                  ]}
-                >
-                  {pedido.status.tipoStatus}
-                </Text>
-                <Text style={styles.price}>
-                  R$ {pedido.valorCompra.toFixed(2)}
-                </Text>
-              </View>
-
-              
-            </View>
           </View>
-        )})}
+        ))}
       </ScrollView>
     </View>
   );

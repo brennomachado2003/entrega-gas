@@ -2,7 +2,7 @@ import { useState } from "react";
 import { EntregadorCadastroDTO } from "../../pages/cadastro/entregador/types";
 import {validarCadastroEntregador} from "../../util/validacao/entregador/validarCadastroUsuario";
 import { Alert } from "react-native";
-import {cadastrarEntregador} from "../../service/entregadorService";
+import {cadastrarEntregador} from "../../service/entregador/entregadorService";
 import { formatPraEnviar } from "../../util/inputFormatters";
 
 export function useCadastroEntregador() {

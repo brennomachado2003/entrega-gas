@@ -1,6 +1,7 @@
 import { LoginRequestDTO } from "../../pages/login/types";
 import { isValidEmail, isValidCPF } from "../../util/validacao/inputValidar";
-import {loginUsuario} from "../../service/loginService";
+import {loginUsuario} from "../../service/usuario/usuarioService";
+import {loginEntregador} from "../../service/entregador/entregadorService";
 import { useState } from "react";
 import { salvarUsuario } from "../../service/authStorage";
 import { useAuthContext } from "../auth/useAuthContext";
@@ -20,7 +21,7 @@ export function useLogin() {
                 response = await loginUsuario(from);
             }
             else if(isValidCPF(from.login)) {
-                response = await loginUsuario(from)
+                response = await loginEntregador(from)
             }
             else {
                 setError("Digite um email ou CPF válido.");

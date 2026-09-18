@@ -1,6 +1,6 @@
 import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { alternarStatusEntregador } from "../../service/entregadorService";
+import { alternarStatusEntregador } from "../../service/entregador/entregadorService";
 
 export function useTrocaAtivoEntregador() {
   const [carregando, setCarregando] = useState(false);

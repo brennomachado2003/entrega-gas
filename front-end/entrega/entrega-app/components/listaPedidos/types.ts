@@ -1,3 +1,11 @@
+
+
+export interface AceitarPedidoRequestDTO {
+    pedidoId: number;
+    entregadorId: number;
+}
+
+
 export interface HistoricoRequestDTO {
     usuarioId: number;
 }
@@ -6,11 +14,11 @@ export interface HistoricoEntregadorRequestDTO {
     entregadorId: number;
 }
 
-export interface ProdutoItemPedidoDTO {
-    idProduto: number;
-    nomeProduto: string;
+export interface ItemPedidoResponseDTO {
+    produtoId: number;
     quantidade: number;
-    valorUnitario: number;
+    preco: number;
+    desconto: number;
 }
 
 export interface StatusPedidoDTO {
@@ -20,14 +28,10 @@ export interface StatusPedidoDTO {
 
 export interface PedidoEntregaResponseDTO {
     idPedido: number;
-    nomeCliente: string;
-    telefoneCliente: string;
-    rua: string;
-    numero: string;
-    bairro: string;
-    cidade: string;
+    idCliente: number;
+    idEndereco: number;
     valorCompra: number;
-    produtos: ProdutoItemPedidoDTO[];
+    produtos: ItemPedidoResponseDTO[];
     dataPedido: string;
     status: StatusPedidoDTO;
 }

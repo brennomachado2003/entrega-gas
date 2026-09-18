@@ -1,8 +1,10 @@
-import CadastroEntregador from "./cadastro/entregador";
+import CadastroEntregador from "./entregador/cadastro/entregador";
 import Login from "./login";
-import CadastroUsuario from "./cadastro/usuario";
-import Home from "./home/home";
-import Pedido from "./pedido";
-import SolicitarEntregador from "./solicitarEntregador";
+import CadastroUsuario from "./usuario/cadastro/usuario";
+import FazerPedido from "./usuario/fazerPedido";
+import SolicitarEntregador from "./usuario/solicitarEntregador";
+import HomeEntregador from "./entregador/home/homeEntregador";
+import HomeUsuario from "./usuario/home/homeUsuario";
+import Pedido from "./usuario/pedido";
 
-export { CadastroEntregador, Login, CadastroUsuario, Home, Pedido, SolicitarEntregador };
+export { CadastroEntregador, Login, CadastroUsuario, HomeEntregador, HomeUsuario, FazerPedido, SolicitarEntregador, Pedido };

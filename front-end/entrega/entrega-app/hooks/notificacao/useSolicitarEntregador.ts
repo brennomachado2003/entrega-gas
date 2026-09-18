@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { solicitarEntregador } from "../../service/notificacaoService";
+import { solicitarEntregador } from "../../service/notificacao/notificacaoService";
 
 export function useSolicitarEntregador() {
   const [loading, setLoading] = useState(false);

@@ -5,7 +5,7 @@ import {
   PedidoEntregaResponseDTO,
 } from "../../components/listaPedidos/types";
 
-import { listaPedidos } from "../../service/pedidosService";
+import { listaPedidos } from "../../service/pedido/pedidosService";
 import { obterUsuario } from "../../service/authStorage";
 
 export function useListaPedidos() {

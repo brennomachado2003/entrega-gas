@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8080";
+const API_URL = "http://localhost:8091";
 
 async function request(url, options = {}) {
     const response = await fetch(`${API_URL}${url}`, options);
@@ -25,6 +25,10 @@ async function request(url, options = {}) {
         throw new Error(`${response.status} - ${detalheErro}`);
     }
     return data;
+}
+
+export function conectarSSE(url) {
+    return new EventSource(`${API_URL}${url}`);
 }
  
 export function post(url, body) {

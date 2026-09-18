@@ -2,8 +2,7 @@ import { useState } from "react";
 
 import {
   aceitarSolicitacao,
-  PedidoEntregaResponseDTO,
-} from "../../service/notificacaoService";
+} from "../../service/notificacao/notificacaoService";
 
 export function useAceitarNotificacao() {
   const [loading, setLoading] = useState(false);

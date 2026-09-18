@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Alert } from "react-native";
 
-import {cancelarPedido} from "../../service/pedidosService";
+import {cancelarPedido} from "../../service/pedido/pedidosService";
 import { PedidoResponseDTO } from "../../pages/pedido/types";
 
 export function useCancelarPedido() {

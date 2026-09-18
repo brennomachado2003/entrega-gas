@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Alert } from "react-native";
 import { UsuarioCadastroDTO } from "../../pages/cadastro/usuario/types";
-import { cadastrarUsuario } from "../../service/usuarioService";
+import { cadastrarUsuario } from "../../service/usuario/usuarioService";
 import { formatPraEnviar }
 from "../../util/inputFormatters";
 import { validarCadastroUsuario }

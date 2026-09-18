@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { listarProdutos } from "../../service/produtoService";
+import { listarProdutos } from "../../service/produto/produtoService";
 import { ProdutoPedidoDTO } from "../../components/listProdutos/types";
 
 export function useListProdutos() {

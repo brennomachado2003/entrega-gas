@@ -15,19 +15,24 @@ export default function Notificacao({
   onAceitar,
   onRecusar,
 }: Props) {
+
   if (!visivel) {
     return null;
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>🔔 Nova Solicitação</Text>
+
+      <Text style={styles.titulo}>
+        🔔 Nova Solicitação
+      </Text>
 
       <Text style={styles.mensagem}>
         Pedido #{pedidoId}
       </Text>
 
       <View style={styles.botoes}>
+
         <Pressable
           style={styles.botaoAceitar}
           onPress={onAceitar}
@@ -45,7 +50,9 @@ export default function Notificacao({
             Recusar
           </Text>
         </Pressable>
+
       </View>
     </View>
   );
 }
+

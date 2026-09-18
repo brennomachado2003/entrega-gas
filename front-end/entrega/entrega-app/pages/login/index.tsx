@@ -12,12 +12,8 @@ export default function Login() {
   const [form, setForm] = useState<LoginRequestDTO>({login: "", senha: ""});
   
   async function entrar() {
-    const usuario = await login(form);
-
-    if (usuario) {
-        navigation.navigate("Home" as never);
-    }
-}
+    await login(form);
+  }
 
   return (
     <AnimatedCadastro>

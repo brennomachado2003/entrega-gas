@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import {cadastrarPedido} from "../../service/pedidosService";
+import {cadastrarPedido} from "../../service/pedido/pedidosService";
 import {PedidoRequest} from "../../pages/pedido/types";
 
 type UsuarioStorage = {
@@ -14,6 +14,8 @@ type UsuarioStorage = {
 
 export function useCadastrarPedido() {
   const [loading, setLoading] = useState(false);
+
+
 
   async function cadastrar(
     pedido: Omit<PedidoRequest, "usuarioId">

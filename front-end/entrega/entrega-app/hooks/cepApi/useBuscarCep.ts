@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { apiService } from "../../service/apiBuscarCep";
+import { apiService } from "../../service/logistica/buscarLocalizacao/apiBuscarCep";
 import { validarCep } from "../../util/validacao/cep/validarCep";
 
 export function useBuscarCep() {

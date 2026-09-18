@@ -10,6 +10,9 @@ import {
 import { styles } from "./style";
 import { useListaPedidosEntregador } from "../../hooks/pedido/useHistoricoDePedidosEntregador";
 
+import ProdutoPedido from "../../components/produtoPedido";
+import EnderecoPedido from "../enderecoPedido";
+
 function getStatusStyle(idStatus: number) {
   switch (idStatus) {
     case 1: // Rascunho
@@ -106,7 +109,9 @@ export default function ListaPedidosEntregador() {
         contentContainerStyle={styles.list}
       >
         {pedidos.map((pedido) => {
-          const statusStyle = getStatusStyle(pedido.status.idStatus);
+          const statusStyle = getStatusStyle(
+            pedido.status.idStatus
+          );
 
           return (
             <View
@@ -114,56 +119,39 @@ export default function ListaPedidosEntregador() {
               style={styles.card}
             >
               <View style={styles.header}>
-              <Text style={styles.pedido}>
-                Pedido #{pedido.idPedido}
-              </Text>
-            </View>
-
-            <Text style={styles.address}>
-              {pedido.rua}, {pedido.numero}
-            </Text>
-
-            <Text style={styles.address}>
-              {pedido.bairro} - {pedido.cidade}
-            </Text>
-
-            {pedido.produtos.map((produto, index) => (
-              <Text
-                key={index}
-                style={styles.product}
-              >
-                🛢️ {produto.nomeProduto}
-              </Text>
-            ))}
-
-            <View style={styles.footer}>
-              <Text style={styles.date}>
-                {new Date(
-                  pedido.dataPedido
-                ).toLocaleDateString("pt-BR")}
-              </Text>
-
-              <View>
-                 <Text
-                  style={[
-                    styles.status,
-                    {
-                      backgroundColor: statusStyle.backgroundColor,
-                      color: statusStyle.color,
-                    },
-                  ]}
-                >
-                  {pedido.status.tipoStatus}
-                </Text>
-                <Text style={styles.price}>
-                  R$ {pedido.valorCompra.toFixed(2)}
+                <Text style={styles.pedido}>
+                  Pedido #{pedido.idPedido}
                 </Text>
               </View>
 
-              
+              <EnderecoPedido
+                idEndereco={pedido.idEndereco}
+              />
+
+              {pedido.produtos.map((produto) => (
+                <ProdutoPedido
+                  key={produto.produtoId}
+                  produtoId={produto.produtoId}
+                  quantidade={produto.quantidade}
+                />
+              ))}
+
+              <View style={styles.footer}>
+                <Text style={styles.date}>
+                  {new Date(
+                    pedido.dataPedido
+                  ).toLocaleDateString("pt-BR")}
+                </Text>
+
+                <View>
+                  <Text style={styles.price}>
+                    R$ {pedido.valorCompra.toFixed(2)}
+                  </Text>
+                </View>
+              </View>
             </View>
-          </View>
-        )})}
+          );
+        })}
       </ScrollView>
     </View>
   );

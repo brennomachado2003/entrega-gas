@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { recusarSolicitacao } from "../../service/notificacaoService";
+import { recusarSolicitacao } from "../../service/notificacao/notificacaoService";
 
 export function useRecusarNotificacao() {
   const [loading, setLoading] = useState(false);
