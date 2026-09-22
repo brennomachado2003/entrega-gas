@@ -12,8 +12,8 @@ public class KafkaTopicConfig {
     public NewTopic enderecoCadastradoTopic() {
         return TopicBuilder
                 .name("endereco-cadastrado")
-                .partitions(3)
-                .replicas(3)
+                .partitions(2)
+                .replicas(2)
                 .build();
     }
 }

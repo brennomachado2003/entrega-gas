@@ -12,8 +12,8 @@ public class KafkaTopicConfig {
     public NewTopic entregadorCadastradoTopic() {
         return TopicBuilder
                 .name("pedido-criado")
-                .partitions(3)
-                .replicas(3)
+                .partitions(2)
+                .replicas(2)
                 .build();
     }
 }

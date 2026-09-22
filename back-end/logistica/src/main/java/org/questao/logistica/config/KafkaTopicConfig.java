@@ -12,8 +12,8 @@ public class KafkaTopicConfig {
     public NewTopic enderecoLocalizadoTopic() {
         return TopicBuilder
                 .name("endereco-localizado")
-                .partitions(3)
-                .replicas(3)
+                .partitions(2)
+                .replicas(2)
                 .build();
     }
 
@@ -21,8 +21,8 @@ public class KafkaTopicConfig {
     public NewTopic listaEntregadoresTopic() {
         return TopicBuilder
                 .name("lista-entregadores")
-                .partitions(3)
-                .replicas(3)
+                .partitions(1)
+                .replicas(2)
                 .build();
     }
 }

@@ -12,7 +12,7 @@ public class KafkaTopicConfig {
     public NewTopic pedidoAceitaTopic() {
         return TopicBuilder
                 .name("pedido-aceito")
-                .partitions(2)
+                .partitions(1)
                 .replicas(2)
                 .build();
     }
