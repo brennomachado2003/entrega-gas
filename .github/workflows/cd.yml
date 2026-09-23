@@ -32,67 +32,67 @@
           with:
             context: ./back-end/pedidos
             push: true
-            tags: brennoInfnet/uber-gas-pedidos:latest
+            tags: brennoinfnet/uber-gas-pedidos:latest
 
         - name: Build e push - empresa
           uses: docker/build-push-action@v6
           with:
             context: ./back-end/empresa
             push: true
-            tags: brennoInfnet/uber-gas-empresa:latest
+            tags: brennoinfnet/uber-gas-empresa:latest
 
         - name: Build e push - notificacao
           uses: docker/build-push-action@v6
           with:
             context: ./back-end/notificacao
             push: true
-            tags: brennoInfnet/uber-gas-notificacao:latest
+            tags: brennoinfnet/uber-gas-notificacao:latest
 
         - name: Build e push - server
           uses: docker/build-push-action@v6
           with:
             context: ./back-end/server
             push: true
-            tags: brennoInfnet/uber-gas-server:latest
+            tags: brennoinfnet/uber-gas-server:latest
 
         - name: Build e push - usuario
           uses: docker/build-push-action@v6
           with:
             context: ./back-end/usuario
             push: true
-            tags: brennoInfnet/uber-gas-usuario:latest
+            tags: brennoinfnet/uber-gas-usuario:latest
 
         - name: Build e push - logistica
           uses: docker/build-push-action@v6
           with:
             context: ./back-end/logistica
             push: true
-            tags: brennoInfnet/uber-gas-logistica:latest
+            tags: brennoinfnet/uber-gas-logistica:latest
 
         - name: Build e push - produtos
           uses: docker/build-push-action@v6
           with:
             context: ./back-end/produtos
             push: true
-            tags: brennoInfnet/uber-gas-produtos:latest
+            tags: brennoinfnet/uber-gas-produtos:latest
 
         - name: Build e push - entregador
           uses: docker/build-push-action@v6
           with:
             context: ./back-end/entregador
             push: true
-            tags: brennoInfnet/uber-gas-entregador:latest
+            tags: brennoinfnet/uber-gas-entregador:latest
 
         - name: Build e push - gateway
           uses: docker/build-push-action@v6
           with:
             context: ./back-end/gateway
             push: true
-            tags: brennoInfnet/uber-gas-gateway:latest
+            tags: brennoinfnet/uber-gas-gateway:latest
 
         - name: Build e push - estoque
           uses: docker/build-push-action@v6
           with:
             context: ./back-end/estoque
             push: true
-            tags: brennoInfnet/uber-gas-estoque:latest
+            tags: brennoinfnet/uber-gas-estoque:latest
