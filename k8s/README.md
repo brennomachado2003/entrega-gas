@@ -640,3 +640,8 @@ O Kubernetes ficará responsável pela aplicação:
 | PostgreSQL/PostGIS | Banco de dados |
 | Kafka | Comunicação assíncrona e eventos |
 | Graylog | Centralização de logs |
+
+
+
+
+
