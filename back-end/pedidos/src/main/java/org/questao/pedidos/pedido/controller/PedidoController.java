@@ -5,17 +5,13 @@ import org.questao.pedidos.pedido.dto.AceitarPedidoRequestDTO;
 import org.questao.pedidos.pedido.dto.PedidoEntregaResponseDTO;
 import org.questao.pedidos.pedido.dto.PedidoRequest;
 import org.questao.pedidos.pedido.dto.PedidoResponseDTO;
-import org.questao.pedidos.itemPedido.service.ItemPedidoService;
-import org.questao.pedidos.pedido.intraestrutura.PedidoEntity;
 import org.questao.pedidos.pedido.intraestrutura.PedidoMapper;
 import org.questao.pedidos.pedido.service.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/pedido")

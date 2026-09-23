@@ -145,7 +145,9 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://server:8088/eureka
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/empresa
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-1:19092,kafka-2:19092,kafka-3:19092
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-1:19092,kafka-2:19092
+      - GRAYLOG_HOST=graylog
+      - GRAYLOG_PORT=12201
     ports:
       - "8083:8083"
     networks:
@@ -161,7 +163,9 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://server:8088/eureka
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/entregador
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-1:19092,kafka-2:19092,kafka-3:19092
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-1:19092,kafka-2:19092
+      - GRAYLOG_HOST=graylog
+      - GRAYLOG_PORT=12201
     ports:
       - "8086:8086"
     networks:
@@ -177,8 +181,9 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://server:8088/eureka
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/estoque
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-1:19092,kafka-2:19092,kafka-3:19092
-
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-1:19092,kafka-2:19092
+      - GRAYLOG_HOST=graylog
+      - GRAYLOG_PORT=12201
     ports:
       - "8087:8087"
     networks:
@@ -193,6 +198,8 @@ services:
       - pedidos
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://server:8088/eureka
+      - GRAYLOG_HOST=graylog
+      - GRAYLOG_PORT=12201
     ports:
       - "8091:8091"
     networks:
@@ -208,7 +215,9 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://server:8088/eureka
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/logistica
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-1:19092,kafka-2:19092,kafka-3:19092
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-1:19092,kafka-2:19092
+      - GRAYLOG_HOST=graylog
+      - GRAYLOG_PORT=12201
 
     ports:
       - "8084:8084"
@@ -225,7 +234,9 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://server:8088/eureka
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/notificacao
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-1:19092,kafka-2:19092,kafka-3:19092
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-1:19092,kafka-2:19092
+      - GRAYLOG_HOST=graylog
+      - GRAYLOG_PORT=12201
     ports:
       - "8090:8090"
     networks:
@@ -241,7 +252,9 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://server:8088/eureka
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/pedidos
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-1:19092,kafka-2:19092,kafka-3:19092
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-1:19092,kafka-2:19092
+      - GRAYLOG_HOST=graylog
+      - GRAYLOG_PORT=12201
     ports:
       - "8089:8089"
     networks:
@@ -257,8 +270,9 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://server:8088/eureka
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/produtos
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-1:19092,kafka-2:19092,kafka-3:19092
-
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-1:19092,kafka-2:19092
+      - GRAYLOG_HOST=graylog
+      - GRAYLOG_PORT=12201
     ports:
       - "8082:8082"
     networks:
@@ -274,7 +288,9 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://server:8088/eureka
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/usuario
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-1:19092,kafka-2:19092,kafka-3:19092
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-1:19092,kafka-2:19092
+      - GRAYLOG_HOST=graylog
+      - GRAYLOG_PORT=12201
     ports:
       - "8085:8085"
     networks:
@@ -290,6 +306,76 @@ services:
     networks:
       - microservicos-net
 
+
+  mongodb:
+    image: mongo:7.0
+    container_name: uber-gas-mongodb
+    restart: unless-stopped
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - microservicos-net
+
+
+  graylog-datanode:
+    image: graylog/graylog-datanode:7.1
+    container_name: uber-gas-graylog-datanode
+    hostname: graylog-datanode
+    restart: unless-stopped
+    environment:
+      GRAYLOG_DATANODE_NODE_ID_FILE: /var/lib/graylog-datanode/node-id
+      GRAYLOG_DATANODE_PASSWORD_SECRET: "3b0c21bf4ed917abc258fdca710949845296f34d8857fc585f2402663b212adc"
+      GRAYLOG_DATANODE_MONGODB_URI: "mongodb://mongodb:27017/graylog"
+    volumes:
+      - graylog_datanode:/var/lib/graylog-datanode
+    depends_on:
+      - mongodb
+    networks:
+      - microservicos-net
+
+
+  graylog:
+    image: graylog/graylog:7.1
+    container_name: uber-gas-graylog
+    hostname: graylog
+    restart: unless-stopped
+
+    environment:
+      GRAYLOG_NODE_ID_FILE: /usr/share/graylog/data/config/node-id
+      GRAYLOG_HTTP_BIND_ADDRESS: "0.0.0.0:9000"
+      GRAYLOG_HTTP_EXTERNAL_URI: "http://localhost:9000/"
+      GRAYLOG_MONGODB_URI: "mongodb://mongodb:27017/graylog"
+      GRAYLOG_REPORT_DISABLE_SANDBOX: "true"
+      GRAYLOG_PASSWORD_SECRET: "3b0c21bf4ed917abc258fdca710949845296f34d8857fc585f2402663b212adc"
+      GRAYLOG_ROOT_PASSWORD_SHA2: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+
+    ports:
+      - "9000:9000"
+      - "12201:12201/tcp"
+      - "12201:12201/udp"
+
+    volumes:
+      - graylog_data:/usr/share/graylog/data
+
+    depends_on:
+      - mongodb
+      - graylog-datanode
+
+    networks:
+      - microservicos-net
+
+  graylog-init:
+    image: curlimages/curl:latest
+    container_name: graylog-init
+    depends_on:
+      - graylog
+    volumes:
+      - ./graylog-init/init.sh:/init.sh:ro
+    entrypoint: [ "/bin/sh", "/init.sh" ]
+    networks:
+      - microservicos-net
+
 networks:
   microservicos-net:
 
@@ -297,4 +383,8 @@ networks:
 
 volumes:
   postgres_data:
+  mongodb_data:
+  mongodb_config:
+  graylog_datanode:
+  graylog_data:
 

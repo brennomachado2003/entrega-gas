@@ -38,12 +38,9 @@ export default function EntregadorStack() {
       const sucesso = await expirar(solicitacao.idSolicitacao);
       if (sucesso) removerSolicitacao(solicitacao.idSolicitacao);
     }, 5000);
-
-
     return () => {
       clearTimeout(timer);
     };
-
   }, [solicitacao, expirar, removerSolicitacao]);
 
 

@@ -1,6 +1,8 @@
 # Como rodar o Uber Gas no Kubernetes
 
-Este projeto utiliza Kubernetes para orquestrar os microsserviços, frontend, Kafka e PostgreSQL/PostGIS.
+Este projeto utiliza Kubernetes para orquestrar os microsserviços, o frontend e o Eureka.
+
+O PostgreSQL/PostGIS, Kafka e Graylog ficam fora do Kubernetes e continuam sendo executados separadamente, por exemplo, através do Docker Compose.
 
 A estrutura dos manifests é:
 
@@ -18,9 +20,7 @@ k8s/
 ├── 08-pedidos.yaml
 ├── 09-produtos.yaml
 ├── 10-usuario.yaml
-├── 11-frontend.yaml
-├── 12-kafka.yaml
-└── 13-postgres.yaml
+└── 11-frontend.yaml
 ```
 
 ---
@@ -80,9 +80,7 @@ ecommerce-control-plane  Ready    control-plane
 
 As imagens dos microsserviços precisam existir antes de serem utilizadas pelo Kubernetes.
 
-Na raiz do projeto `Uber Gas`, execute os builds.
-
-Exemplo:
+Na raiz do projeto `Uber Gas`, execute os builds:
 
 ```bash
 docker build -t server:1.0 ./back-end/server
@@ -100,23 +98,17 @@ docker build -t frontend:1.0 ./front-end/entrega/entrega-app
 
 ### Importante
 
-Não é necessário criar uma imagem `banco-init:1.0`.
-
-O arquivo `13-postgres.yaml` utiliza um **ConfigMap** para fornecer o `banco.sql` ao PostgreSQL.
-
-Também não é necessário criar manualmente imagens `kafka-1:1.0` e `kafka-2:1.0`.
-
-O `12-kafka.yaml` utiliza diretamente:
+Não é necessário criar imagens Docker para:
 
 ```text
-apache/kafka:4.3.1
+PostgreSQL/PostGIS
+Kafka
+Graylog
 ```
 
-Da mesma forma, o PostgreSQL utiliza:
+Esses componentes não fazem parte dos manifests Kubernetes.
 
-```text
-postgis/postgis:16-3.4
-```
+Eles continuam sendo executados externamente ao cluster Kubernetes.
 
 ---
 
@@ -138,8 +130,6 @@ kind load docker-image gateway:1.0 --name ecommerce
 kind load docker-image frontend:1.0 --name ecommerce
 ```
 
-Como Kafka e PostgreSQL usam imagens públicas, o Kubernetes poderá baixá-las diretamente.
-
 ---
 
 ## 5. Aplicar os manifests
@@ -150,7 +140,7 @@ Na raiz do projeto:
 kubectl apply -f k8s/
 ```
 
-Como os arquivos estão numerados, eles serão aplicados seguindo a ordem:
+Os manifests são:
 
 ```text
 00-namespace.yaml
@@ -165,8 +155,6 @@ Como os arquivos estão numerados, eles serão aplicados seguindo a ordem:
 09-produtos.yaml
 10-usuario.yaml
 11-frontend.yaml
-12-kafka.yaml
-13-postgres.yaml
 ```
 
 Você também pode aplicar individualmente, caso queira testar cada componente:
@@ -177,7 +165,7 @@ kubectl apply -f k8s/01-server.yaml
 kubectl apply -f k8s/02-empresa.yaml
 ```
 
-etc.
+E assim por diante.
 
 ---
 
@@ -231,16 +219,15 @@ pedidos
 produtos
 usuario
 frontend
-postgres
-kafka-1
-kafka-2
 ```
+
+PostgreSQL, Kafka e Graylog não aparecerão nessa lista, pois estão fora do Kubernetes.
 
 ---
 
 # Comunicação interna
 
-Dentro do Kubernetes, os serviços utilizam o nome do Service como hostname.
+Dentro do Kubernetes, os microsserviços utilizam o nome do Service como hostname.
 
 ### Eureka
 
@@ -252,33 +239,69 @@ http://server:8088/eureka
 
 ### PostgreSQL
 
-Os microsserviços devem utilizar:
+O PostgreSQL está fora do Kubernetes.
+
+Os microsserviços precisam utilizar o endereço onde o PostgreSQL estiver disponível.
+
+Exemplo:
 
 ```text
-postgres:5432
-```
-
-Por exemplo:
-
-```text
-jdbc:postgresql://postgres:5432/empresa
+jdbc:postgresql://<ENDERECO-DO-POSTGRES>:5432/empresa
 ```
 
 ou:
 
 ```text
-jdbc:postgresql://postgres:5432/pedidos
+jdbc:postgresql://<ENDERECO-DO-POSTGRES>:5432/pedidos
 ```
+
+Os bancos utilizados pelo projeto são:
+
+```text
+empresa
+entregador
+estoque
+logistica
+notificacao
+pedidos
+produtos
+usuario
+```
+
+> O endereço `<ENDERECO-DO-POSTGRES>` deve ser substituído pelo endereço realmente acessível pelos Pods do Kubernetes.
 
 ### Kafka
 
-Os microsserviços devem utilizar:
+O Kafka também está fora do Kubernetes.
+
+Os microsserviços devem utilizar o endereço do Kafka que seja acessível pelo cluster.
+
+Exemplo:
+
+```text
+<ENDERECO-DO-KAFKA>:19092
+```
+
+Caso `kafka-1` e `kafka-2` sejam acessíveis a partir do Kubernetes:
 
 ```text
 kafka-1:19092,kafka-2:19092
 ```
 
-Não utilize `kafka-3`, pois o projeto possui apenas dois brokers.
+> Não utilize `kafka-3`, pois o projeto possui apenas dois brokers.
+
+### Graylog
+
+O Graylog também está fora do Kubernetes.
+
+Configure os serviços que enviam logs para utilizar o endereço correspondente ao ambiente externo.
+
+Exemplo:
+
+```text
+GRAYLOG_HOST=<ENDERECO-DO-GRAYLOG>
+GRAYLOG_PORT=12201
+```
 
 ---
 
@@ -310,9 +333,7 @@ Verifique:
 kubectl get service frontend -n ecommerce
 ```
 
-Como o ambiente utilizado é Kind, o acesso ao `LoadBalancer` pode não funcionar da mesma forma que em um cluster Kubernetes de cloud.
-
-Para acessar localmente, utilize:
+Para acessar localmente:
 
 ```bash
 kubectl port-forward -n ecommerce svc/frontend 3000:80
@@ -348,86 +369,37 @@ http://localhost:8088
 
 ---
 
-# 11. Verificar o PostgreSQL
+# 11. Verificar os microsserviços
 
-Verifique o Pod:
-
-```bash
-kubectl get pods -n ecommerce -l app=postgres
-```
-
-Verifique os logs:
-
-```bash
-kubectl logs -n ecommerce statefulset/postgres
-```
-
-Para entrar no PostgreSQL:
-
-```bash
-kubectl exec -it -n ecommerce statefulset/postgres -- \
-  psql -U postgres
-```
-
-Depois:
-
-```sql
-\l
-```
-
-Você deverá encontrar:
-
-```text
-empresa
-entregador
-estoque
-logistica
-notificacao
-pedidos
-produtos
-usuario
-```
-
-Para sair:
-
-```sql
-\q
-```
-
----
-
-# 12. Verificar Kafka
-
-Verifique os dois brokers:
-
-```bash
-kubectl get pods -n ecommerce -l app=kafka-1
-kubectl get pods -n ecommerce -l app=kafka-2
-```
-
-Ou:
+Para verificar todos os Pods:
 
 ```bash
 kubectl get pods -n ecommerce
 ```
 
-Os dois devem estar funcionando.
-
-Para verificar os logs:
+Para verificar um serviço específico:
 
 ```bash
-kubectl logs -n ecommerce statefulset/kafka-1
+kubectl get pods -n ecommerce -l app=produtos
 ```
 
-e:
+Para visualizar os logs:
 
 ```bash
-kubectl logs -n ecommerce statefulset/kafka-2
+kubectl logs -n ecommerce deployment/produtos
+```
+
+Exemplos:
+
+```bash
+kubectl logs -n ecommerce deployment/empresa
+kubectl logs -n ecommerce deployment/pedidos
+kubectl logs -n ecommerce deployment/usuario
 ```
 
 ---
 
-# 13. Diagnóstico de problemas
+# 12. Diagnóstico de problemas
 
 Se algum Pod estiver em:
 
@@ -459,9 +431,15 @@ Para acompanhar os logs de um Deployment:
 kubectl logs -n ecommerce deployment/produtos
 ```
 
+Para verificar os eventos:
+
+```bash
+kubectl get events -n ecommerce
+```
+
 ---
 
-# 14. Verificar a porta dos microsserviços
+# 13. Verificar as portas dos microsserviços
 
 Se algum serviço estiver com erro de readiness, verifique os logs:
 
@@ -471,7 +449,7 @@ kubectl logs -n ecommerce deployment/produtos
 
 Confira se o Spring Boot iniciou na porta configurada.
 
-As portas do projeto são:
+As portas dos componentes Kubernetes são:
 
 ```text
 produtos       8082
@@ -485,12 +463,19 @@ pedidos        8089
 notificacao    8090
 gateway        8091
 frontend       80
-postgres       5432
+```
+
+As portas dos componentes externos são gerenciadas fora do Kubernetes.
+
+```text
+PostgreSQL     5432
+Kafka          19092
+Graylog        12201
 ```
 
 ---
 
-# 15. Alterei o código de um microsserviço
+# 14. Alterei o código de um microsserviço
 
 Por exemplo, se você alterou o serviço `produtos`:
 
@@ -520,7 +505,7 @@ kubectl rollout status deployment/produtos -n ecommerce
 
 ---
 
-# 16. Escalar um microsserviço
+# 15. Escalar um microsserviço
 
 Como o Kubernetes é responsável pela escalabilidade, um microsserviço stateless pode ter múltiplas réplicas.
 
@@ -546,27 +531,33 @@ kubectl scale deployment empresa --replicas=1 -n ecommerce
 
 ---
 
-# 17. Ver todos os recursos
+# 16. Ver todos os recursos
 
 ```bash
 kubectl get all -n ecommerce
 ```
 
-Para incluir os PVCs:
+Para verificar os Deployments:
 
 ```bash
-kubectl get pvc -n ecommerce
+kubectl get deployments -n ecommerce
 ```
 
-Para verificar os StatefulSets:
+Para verificar os Services:
 
 ```bash
-kubectl get statefulsets -n ecommerce
+kubectl get services -n ecommerce
+```
+
+Para verificar os Pods:
+
+```bash
+kubectl get pods -n ecommerce
 ```
 
 ---
 
-# 18. Derrubar o ambiente
+# 17. Derrubar o ambiente
 
 Para remover todos os recursos do Kubernetes:
 
@@ -586,7 +577,7 @@ Isso remove o cluster local e todos os recursos que estão dentro dele.
 
 # Resumo da arquitetura
 
-O Kubernetes ficará responsável por:
+O Kubernetes ficará responsável pela aplicação:
 
 ```text
                     Kubernetes
@@ -616,31 +607,36 @@ O Kubernetes ficará responsável por:
               Produtos       Usuario
                 :8082          :8085
 
-                         │
-             ┌───────────┴───────────┐
-             ▼                       ▼
-        PostgreSQL                 Kafka
-          :5432              ┌──────┴──────┐
-                             ▼             ▼
-                          kafka-1       kafka-2
-                          :19092        :19092
+
+              Infraestrutura externa
+                       │
+          ┌────────────┼────────────┐
+          ▼            ▼            ▼
+      PostgreSQL      Kafka       Graylog
+       /PostGIS
 ```
 
 ## Componentes Kubernetes
 
-| Arquivo               | Componente         | Tipo                                    |
-| --------------------- | ------------------ | --------------------------------------- |
-| `00-namespace.yaml`   | Namespace          | Namespace                               |
-| `01-server.yaml`      | Eureka             | Deployment + Service                    |
-| `02-empresa.yaml`     | Empresa            | Deployment + Service                    |
-| `03-entregador.yaml`  | Entregador         | Deployment + Service                    |
-| `04-estoque.yaml`     | Estoque            | Deployment + Service                    |
-| `05-gateway.yaml`     | Gateway            | Deployment + Service                    |
-| `06-logistica.yaml`   | Logística          | Deployment + Service                    |
-| `07-notificacao.yaml` | Notificação        | Deployment + Service                    |
-| `08-pedidos.yaml`     | Pedidos            | Deployment + Service                    |
-| `09-produtos.yaml`    | Produtos           | Deployment + Service                    |
-| `10-usuario.yaml`     | Usuário            | Deployment + Service                    |
-| `11-frontend.yaml`    | Frontend           | Deployment + Service                    |
-| `12-kafka.yaml`       | Kafka              | 2 StatefulSets + Services               |
-| `13-postgres.yaml`    | PostgreSQL/PostGIS | StatefulSet + Service + PVC + ConfigMap |
+| Arquivo | Componente | Tipo |
+|---|---|---|
+| `00-namespace.yaml` | Namespace | Namespace |
+| `01-server.yaml` | Eureka | Deployment + Service |
+| `02-empresa.yaml` | Empresa | Deployment + Service |
+| `03-entregador.yaml` | Entregador | Deployment + Service |
+| `04-estoque.yaml` | Estoque | Deployment + Service |
+| `05-gateway.yaml` | Gateway | Deployment + Service |
+| `06-logistica.yaml` | Logística | Deployment + Service |
+| `07-notificacao.yaml` | Notificação | Deployment + Service |
+| `08-pedidos.yaml` | Pedidos | Deployment + Service |
+| `09-produtos.yaml` | Produtos | Deployment + Service |
+| `10-usuario.yaml` | Usuário | Deployment + Service |
+| `11-frontend.yaml` | Frontend | Deployment + Service |
+
+## Componentes externos ao Kubernetes
+
+| Componente | Responsabilidade |
+|---|---|
+| PostgreSQL/PostGIS | Banco de dados |
+| Kafka | Comunicação assíncrona e eventos |
+| Graylog | Centralização de logs |

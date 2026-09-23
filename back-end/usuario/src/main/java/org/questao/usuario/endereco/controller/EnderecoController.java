@@ -1,6 +1,10 @@
 package org.questao.usuario.endereco.controller;
 
 import org.locationtech.jts.geom.Point;
+import org.questao.usuario.Erros.endereco.ErroAoAtualizarCordenadasEndereco;
+import org.questao.usuario.Erros.endereco.ErroAoBuscarEnderecoPeloId;
+import org.questao.usuario.Erros.endereco.ErroAoCadastrarEndereco;
+import org.questao.usuario.Erros.endereco.ErroAoListarEnderecoPeloUsuario;
 import org.questao.usuario.endereco.dominio.Endereco;
 import org.questao.usuario.endereco.dto.EnderecoRequestDTO;
 import org.questao.usuario.endereco.dto.EnderecoResponseDTO;
@@ -11,6 +15,8 @@ import org.questao.usuario.endereco.service.CadastrarEnderecoService;
 import org.questao.usuario.endereco.service.ListaEnderecoService;
 import org.questao.usuario.usuario.dominio.Usuario;
 import org.questao.usuario.usuario.service.BuscarUsuarioService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +27,7 @@ import java.util.List;
 @RequestMapping("/enderecos")
 public class EnderecoController {
 
+    private static final Logger logger = LoggerFactory.getLogger(EnderecoController.class);
     private final CadastrarEnderecoService cadastrarEnderecoService;
     private final BuscarUsuarioService buscarUsuarioService;
     private final ListaEnderecoService listaEnderecoService;
@@ -38,7 +45,10 @@ public class EnderecoController {
     }
 
     @PostMapping
+    @ExceptionHandler(ErroAoCadastrarEndereco.class)
     public ResponseEntity<EnderecoResponseDTO> cadastrar(@RequestBody EnderecoRequestDTO dto) {
+
+        logger.info("Requisicao cadastrando endereco recebida: {}", dto);
         Usuario usuario = buscarUsuarioService.buscarPorId(dto.getUsuarioId());
         Endereco endereco = EnderecoMapper.requestToDominio(dto, usuario);
         Endereco salvo = cadastrarEnderecoService.cadastrar(endereco);
@@ -47,7 +57,10 @@ public class EnderecoController {
     }
 
     @GetMapping("/usuario/{id}")
+    @ExceptionHandler(ErroAoListarEnderecoPeloUsuario.class)
     public ResponseEntity<List<EnderecoResponseDTO>> buscarPorUsuario(@PathVariable Long id) {
+        logger.info("Requisicao buscar endereco pelo usuario recebida: {}", id);
+
         Usuario usuario = buscarUsuarioService.buscarPorId(id);
         List<Endereco> enderecos = listaEnderecoService.listEndereco(usuario);
         List<EnderecoResponseDTO> response = enderecos.stream().map(EnderecoMapper::enderecoResponseDTO).toList();
@@ -55,7 +68,10 @@ public class EnderecoController {
     }
 
     @GetMapping("/{id}")
+    @ExceptionHandler(ErroAoAtualizarCordenadasEndereco.class)
     public ResponseEntity<LocalizacaoResponseDTO> buscarEndereco(@PathVariable Long id) {
+        logger.info("Requisicao atualizar cordenadas recebida: {}", id);
+
         Endereco endereco = buscarEnderecoService.buscar(id);
         Point point = endereco.getLocalizacao();
 
@@ -67,7 +83,10 @@ public class EnderecoController {
     }
 
     @GetMapping("/endereco/{id}")
+    @ExceptionHandler(ErroAoBuscarEnderecoPeloId.class)
     public ResponseEntity<EnderecoResponseDTO> buscarEnderecoId(@PathVariable Long id) {
+        logger.info("Requisicao busar endereco pelo id recebida: {}", id);
+
         Endereco endereco = buscarEnderecoService.buscar(id);
         return ResponseEntity.ok(EnderecoMapper.enderecoResponseDTO(endereco));
     }

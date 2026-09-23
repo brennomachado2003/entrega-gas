@@ -16,7 +16,6 @@ public class SseDomainEventsPublisher implements DomainEventPublisher {
     private final Map<Long, SseEmitter> conexoes = new ConcurrentHashMap<>();
 
     public SseEmitter conectar(Long idEntregador) {
-
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
         conexoes.put(idEntregador, emitter);
         emitter.onCompletion(() -> {
