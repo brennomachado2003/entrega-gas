@@ -35,9 +35,6 @@ class PedidoServiceTest {
     private BuscarPedidoService buscarPedidoService;
 
     @InjectMocks
-    private CadastrarPedidoService cadastrarPedidoService;
-
-    @InjectMocks
     private CancelarPedidoService cancelarPedidoService;
 
     @InjectMocks
