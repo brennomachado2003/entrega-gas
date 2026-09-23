@@ -1,0 +1,67 @@
+name: CI - Uber Gas
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  test-backend:
+    name: Testar Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Testar pedidos
+        working-directory: back-end/pedidos
+        run: mvn test
+
+      - name: Testar empresa
+        working-directory: back-end/empresa
+        run: mvn test
+
+      - name: Testar notificacao
+        working-directory: back-end/notificacao
+        run: mvn test
+
+      - name: Testar server
+        working-directory: back-end/server
+        run: mvn test
+
+      - name: Testar usuario
+        working-directory: back-end/usuario
+        run: mvn test
+
+      - name: Testar logistica
+        working-directory: back-end/logistica
+        run: mvn test
+
+      - name: Testar produtos
+        working-directory: back-end/produtos
+        run: mvn test
+
+      - name: Testar entregador
+        working-directory: back-end/entregador
+        run: mvn test
+
+      - name: Testar gateway
+        working-directory: back-end/gateway
+        run: mvn test
+
+      - name: Testar estoque
+        working-directory: back-end/estoque
+        run: mvn test
