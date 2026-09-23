@@ -1,0 +1,98 @@
+name: CD - Uber Gas
+
+on:
+  workflow_run:
+    workflows: ["CI - Uber Gas"]
+    types:
+      - completed
+
+jobs:
+  docker:
+    name: Build e publicar imagens Docker
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Login no Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build e push - pedidos
+        uses: docker/build-push-action@v6
+        with:
+          context: ./back-end/pedidos
+          push: true
+          tags: brennoInfnet/uber-gas-pedidos:latest
+
+      - name: Build e push - empresa
+        uses: docker/build-push-action@v6
+        with:
+          context: ./back-end/empresa
+          push: true
+          tags: brennoInfnet/uber-gas-empresa:latest
+
+      - name: Build e push - notificacao
+        uses: docker/build-push-action@v6
+        with:
+          context: ./back-end/notificacao
+          push: true
+          tags: brennoInfnet/uber-gas-notificacao:latest
+
+      - name: Build e push - server
+        uses: docker/build-push-action@v6
+        with:
+          context: ./back-end/server
+          push: true
+          tags: brennoInfnet/uber-gas-server:latest
+
+      - name: Build e push - usuario
+        uses: docker/build-push-action@v6
+        with:
+          context: ./back-end/usuario
+          push: true
+          tags: brennoInfnet/uber-gas-usuario:latest
+
+      - name: Build e push - logistica
+        uses: docker/build-push-action@v6
+        with:
+          context: ./back-end/logistica
+          push: true
+          tags: brennoInfnet/uber-gas-logistica:latest
+
+      - name: Build e push - produtos
+        uses: docker/build-push-action@v6
+        with:
+          context: ./back-end/produtos
+          push: true
+          tags: brennoInfnet/uber-gas-produtos:latest
+
+      - name: Build e push - entregador
+        uses: docker/build-push-action@v6
+        with:
+          context: ./back-end/entregador
+          push: true
+          tags: brennoInfnet/uber-gas-entregador:latest
+
+      - name: Build e push - gateway
+        uses: docker/build-push-action@v6
+        with:
+          context: ./back-end/gateway
+          push: true
+          tags: brennoInfnet/uber-gas-gateway:latest
+
+      - name: Build e push - estoque
+        uses: docker/build-push-action@v6
+        with:
+          context: ./back-end/estoque
+          push: true
+          tags: brennoInfnet/uber-gas-estoque:latest
